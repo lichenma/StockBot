@@ -49,6 +49,30 @@ Let's start with Pandas and use it to analyze time series data.
 
 ### Pandas 
 
+The `pandas-datareader` package allows for reading in data from sources such as Google, World Bank, etc. 
+
+```python 
+import pandas_datareader as pdr 
+import datetime 
+aapl  = pdr.get_data_yahoo('AAPL', 
+                            start=datetime.datetime(2006,10,1),
+                            end=datetime.datetime(2012,1,1))
+```
+
+
+There is also the Quandl library which allows you to get data from Google Finance. 
+
+```python 
+import quandl 
+appl = quandl.get("WIKI/APPL", start_date="2006-10-01", end_date="2012-01-01")
+```
+
+
+### Working With Time Series Data
+
+We start by using `pandas_datareader` to import data into the workspace. The resulting object `aapl` is a DataFrame - a 2-dimensional labeled data structure with columns of potentially different types. Given a DataFrame we can run the `head()` and `tail()` functions to take a peek at the first and the last rows of the DataFrame. 
+
+
 
 
 

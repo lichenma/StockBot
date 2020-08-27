@@ -105,7 +105,82 @@ In practice, this means that you can pass the label of the row labels, such as `
 
 We can sample rows from the dataset using `sample()` and use `resample()` to take a look at the data from a monthly level instead of daily. 
 
-The `resample()` 
+The `resample()` function is often used because it provides elaborate control and more flexibility on the frequency conversion of the time series. You can specify new time intervals, how to handle missing data and indicate how you want to resample the data. 
+
+## Visualizing Time Series Data 
+
+This task is simple to due to Pandas' plotting integration with Mathplotlib - we can just use the `plot()` function and pass the relevant arguments to it. 
+
+```python 
+import matplotlib.pyplot as plt
+
+aapl['Close'].plot(grid=True)
+plt.show()
+```  
+
+# Common Financial Analysis
+
+From here on we can use `pandas` to dive into some of the common financial analyses that you can do so that you can actually start working towards developing a trading strategy. 
+
+We will cover returns, moving windows, volatility calculation and Ordinary Least-Squares Regression (OLS). 
+
+
+## Returns 
+
+The simple daily percentage change doesn't take into account dividends and other factors. It represents the amount of percentage change in the value of a stock over a single day of trading. This value is easily calculated as there is a `pct_change()` function included in the Pandas package. 
+
+```python 
+import numpy as np
+
+daily_close = aapl[['Adj Close']]
+daily_pct_change = daily_close.pct_change()
+```
+
+Note that we calculate the log returns to get a better insight into the growth of the returns over time. 
+
+Know how to calculate daily percentage change is nice but what about when you want to know the monthly or quarterly returns? Here, we can use the `resample()` function. 
+
+```python 
+# Resampling to business months - use last observation as value
+monthly = aapl.resample('BM').apply(lambda x: x[-1])
+# Monthly percentage change 
+monthly.pct_change()
+```
+
+To do things manually without `pct_change()` we divide `daily_close` vlaues by the `daily_close.shift(1) - 1` value. 
+
+
+The formula for calculating returns is as follows: 
+```
+daily_log_returns_shift = np.log(daily_close / daily_close.shift(1))
+```
+
+> r = p(t)/p(t-1) - 1
+
+```python 
+import matplotlib.pyplot as plt
+
+daily_pct_change.hist(bins=50)
+plt.show()
+print(daily_pct_change.describe())
+```
+
+If we take a look at a usual distribution we will see that it is usually very symmetrical and normally distributed - the changes center around the bin 0.00. 
+
+The `cumulative daily rate of return` is useful to determine the value of an investment at regular intervals. You can calculate the cumulative daily rate of return by using the daily percentage change values, adding `1` to them and calculating the cumulative product with the resulting values.  
+
+`cumulative_daily_return = (1 + daily_pct_change).cumprod()` 
+
+If we don't want to see the daily returns but rather the monthly returns - we can easily use the `resample()` function to bring the `cumulative_daily_return` to the montly level 
+
+`cumulative_montly_return = cumulative_daily_return.resample("M").mean()`
+
+This is simply for calculating returns but we will often see that these numbers do not mean much when we do not compare them to other stocks. In the following we will be comparing multiple stocks! 
+
+
+
+
+
 
 
 

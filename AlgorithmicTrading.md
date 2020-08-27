@@ -73,6 +73,40 @@ appl = quandl.get("WIKI/APPL", start_date="2006-10-01", end_date="2012-01-01")
 We start by using `pandas_datareader` to import data into the workspace. The resulting object `aapl` is a DataFrame - a 2-dimensional labeled data structure with columns of potentially different types. Given a DataFrame we can run the `head()` and `tail()` functions to take a peek at the first and the last rows of the DataFrame. 
 
 
+The data returned from `pandas-datareader` contains six columns - high, low, open, close, volumn, adj Close. 
+
+High and low are used to give the extreme price points for the stock each day. Open and close give the price points at the beginning and the end of the day. Volumne is used to register the number of shares that got traded during a single day. Adj Close is the `adjusted closing price` - the closing prices of the day that has been slightly adapted to include any actions that occurred at any time before the next day's open. 
+
+
+
+Tip: We can now save this data to a csv file with the `to_csv()` function from `pandas` and us the `read_csv()` function to read data back into Python. This is extremely handy in cases where, for example, the Yahoo API endpoint has changed and you don't have access to your data any longer 
+
+```Python
+import pandas as pd 
+appl.to_csv('data/appl_ohlc.csv')
+df = pd.read_csv('data/aapl_chlc.csv', header=0, index_col='Date', parse_dates=True)
+```
+
+Now that we have briefly inspected the first lines of the data and taken a look at some summary statistics, its time to go a little deeper. 
+
+One way to do this is to inspect the index and the columns and by selecting a small subset of the data. By subsetting, we get a one-dimensional labeled array that is capable of holding any type. Recall that the original DataFrame structure was a two-dimensional labeled array with columns that potentially hold different types of data. 
+
+```Python
+aapl.index 
+aapl.columns
+```
+
+For example, we can subset the `Close` column by selecting the last 10 values of the Dataframe - use the square brackets `[]` to isolate the last ten values. This looks something like this `aapl['Close'][-10:]` and returns a `Series` - the one dimensional array that is capable of holding any type. 
+
+
+The square brackets can be useful to subset the data but they are maybe not the most idiomatic way to do things with Pandas. One alternate way of handling things is using the `loc()` and `iloc()` functions: the former is used for label-based indexing and the latter is used for positional indexing. 
+
+In practice, this means that you can pass the label of the row labels, such as `2007` and `2016-11-01`, to the `loc()` function, while you pass integers such as `22` and `43` to the `iloc()` function. 
+
+We can sample rows from the dataset using `sample()` and use `resample()` to take a look at the data from a monthly level instead of daily. 
+
+The `resample()` 
+
 
 
 

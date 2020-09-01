@@ -222,6 +222,101 @@ This concludes the first common financial analysis where we explore returns! Mov
 
 ## Moving Windows 
 
+In moving windows, we compute the statistic on a window of data represented by a particular period of time and then slide that window by a specified interval. 
+
+This rolling smoothes out short-term fluctuations and highlights longer-term trends in data. 
+
+```python 
+moving_avg = adj_close_px.rolling(window=40).mean()
+```
+
+We can plot out a couple of windows to see how it affects the data 
+
+```python 
+aapl['42'] = adj_close_px.rolling(window=40).mean()
+
+aapl['252'] = adj_close_px.rolling(window=252).mean()
+
+aapl[['Adj Close', '42', '252']].plot()
+
+plt.show()
+```
+
+### Volatility Calculation 
+
+The volatility of a stock is a measurement of the change in variance in the returns of a stock over a specific period of time. 
+
+This is used to get a feel of the risk and we can compare it to other stocks. Generally the higher the volatility, the riskier the investment in the stock. 
+
+The moving historical standard deviation of the log returns - ie the moving historical volatility - is of particular interest. 
+
+```python
+# rolling_std(data, window) * math.sqrt(window)
+vol = daily_pct_change.rolling(min_periods).std() * np.sqrt(min_periods)
+```
+
+
+As you will notice, the volatility is calculated by taking a rolling window standard deviation on the percentage change in a stock. 
+
+Clearly changing the size of the window will change the overall result: a wider window will make the results less representative. If we make it smaller, then the results will come closer to the standard deviation. 
+
+
+Thus, it is a skill to get the right window size based upon the data sampling frequency. 
+
+
+## Ordinary Least-Squares Regression (OLS)
+
+To perform this traditional regression analysis, we will be using the `statsmodels` library. 
+
+```python 
+import statsmodels.api as sm 
+from pandas.core import datetools
+
+all_adj_close = all_data[['Adj Close']]
+
+all_returns = np.log(all_adj_close/all_adj_close.shift(1))
+
+# Isolate AAPL returns
+aapl_returns = all_returns.iloc[all_returns.index.get_level_values('Ticker') == 'AAPL']
+aapl_returns.index = aapl_returns.index.droplevel('Ticker')
+
+# Isolate MSFT returns
+msft_returns = all_returns.iloc[all)_returns.index.get_level_values('Ticker') == 'MSFT']
+msft_returns.index = msft_returns.index.droplevel('Ticker)
+
+# Build up dataframe
+return_data = pd.concat([aapl_returns, msft_returns], axis=1)[1:]
+return_data.columns = ['AAPL', 'MSFT']
+
+X = sm.add_constant(return_data['AAPL'])
+
+# Constructing the model
+model = sm.OLS(return_data['MSFT'],X).fit()
+
+print(model.summary())
+```
+
+These are data which aren't going deep into but here are some important information which we can also take into account: 
+
+* `R-squared` is the coefficient of determination and indicates how well the regression line approximates the real data points 
+
+* `Adj. R-squared` which is the adjusted R-squared value based on the number of observations and the degrees of freedom of the residuals 
+
+* `F-statistic` measures how significant the fit is. It is calculated by dividing the mean squared error of the model by the mean squared error of the residuals
+
+* `Prob (F-statistic)` indicates the probability that you wil lget the result of the `F-statistic` 
+
+* `Log-likelihood` indicates the log of likelihood function 
+
+* `AIC` is Akaike Information Criterion which adjusts the log-likelihood based on the number of observations and the complexity of the model 
+
+* `BIC` is the Bayesian Information Criterion and is the same as AIC but penalizes models with more parameters more severely. 
+
+
+## Building a Trading Strategy with Python 
+
+
+
 
 
 

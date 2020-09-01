@@ -177,8 +177,34 @@ If we don't want to see the daily returns but rather the monthly returns - we ca
 
 This is simply for calculating returns but we will often see that these numbers do not mean much when we do not compare them to other stocks. In the following we will be comparing multiple stocks! 
 
+First we need data - check out the code below where we get the stock data from Apple, Microsoft, IBM, and Google and store them in one big DataFrame 
 
+```python 
+def get(tickers, startdate, enddate): 
+    def data(ticker):
+        return (pdr.get_data_yahoo(ticker, start=startdate, end=enddate))
+    datas = map(data, tickers)
+    return(pd.concat(datas, keys=tickers,names=['Ticker','Date']))
 
+tickers = ['AAPL', 'MSFT', 'IBM', 'GOOG']
+all_data = get(tickers, datetime.datetime(2006, 10, 1), datetime.datetime(2021, 1, 1))
+```
+
+We can check out the plots for the daily percentage change using 
+
+```python 
+import matplotlib.pyplot as plt
+
+daily_close_px = all_data[['Adj Close']].reset_index().pivot('Date', 'Ticker', 'Adj Close')
+
+daily_pct_change = daily_close_px.pct_change()
+
+daily_pct_change.hist(bins=50, sharex=True, figsize=(12,8))
+
+plt.show()
+```
+
+Another interesting plot to check out is the scatter 
 
 
 

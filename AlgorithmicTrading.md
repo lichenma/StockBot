@@ -204,11 +204,23 @@ daily_pct_change.hist(bins=50, sharex=True, figsize=(12,8))
 plt.show()
 ```
 
-Another interesting plot to check out is the scatter 
+Another interesting plot to check out is the scatter matrix. 
+
+```python 
+import matplotlib.pyplot as plt
+
+pd.scatter_matrix(daily_pct_change, diagonal='kde', alpha=0.1,figsize=(12,12))
+
+plt.show()
+```
+
+In the arguments we specify that we want a Kernel Density Estimate (KDE) plot. This plot estimates the probability density function of a random variable. 
 
 
+This concludes the first common financial analysis where we explore returns! Moving on to moving windows
 
 
+## Moving Windows 
 
 
 

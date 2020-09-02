@@ -2,6 +2,7 @@ import pandas_datareader as pdr
 import datetime 
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 
 
 def get(tickers, startdate, enddate): 
@@ -10,14 +11,21 @@ def get(tickers, startdate, enddate):
     datas = map(data, tickers)
     return(pd.concat(datas, keys=tickers,names=['Ticker','Date']))
 
-tickers = ['AAPL', 'MSFT', 'IBM', 'GOOG']
-all_data = get(tickers, datetime.datetime(2006, 10, 1), datetime.datetime(2021, 1, 1))
 
+aapl = get(['AAPL'], datetime.datetime(2006, 10, 1), datetime.datetime(2021, 1, 1))
 
-daily_close_px = all_data[['Adj Close']].reset_index().pivot('Date', 'Ticker', 'Adj Close')
+short_window = 40
+long_window = 100 
 
-daily_pct_change = daily_close_px.pct_change()
+signals = pd.DataFrame(index=aapl.index)
+signals['signal'] = 0.0
 
-daily_pct_change.hist(bins=50, sharex=True, figsize=(12,8))
+signals['short_mavg'] = aapl['Close'].rolling(window=short_window, min_periods=1, center=False).mean()
 
-plt.show()
+signals['long_mavg'] = aapl['Close'].rolling(window=long_window, min_periods=1, center=False).mean()
+
+signals['signal'][short_window:] = np.where(signals['short_mavg'][short_window:] > signals['long_mavg'][short_window:], 1.0, 0.0)
+
+signals['positions'] = signals['signal'].diff()
+
+print(signals)

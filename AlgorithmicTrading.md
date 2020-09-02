@@ -343,5 +343,33 @@ Aside from these two main strategies, there are also other ones which come up ev
 
 ## Simple Trading Strategy
 
+We will be starting off with the "hello world" of quantitative trading - moving average crossover. We will create two separate Simple Moving Averages (SMA) of a time series with different lookback periods (ex 40 days and 100 days). If the short moving average exceeds the long moving average then we go long - if the long moving average exceeds the short moving average then we exit. 
+
+
+We will create the set of short and long moving averages using the `rolling()` function to start the rolling window calculations. 
+
+This value will be stored in a `signals` DataFrame. 
+
+After the averages have been calculated and stored - we need to generate a buy or sell signal when the short moving average crosses the long moving average. 
+
+```python 
+
+short_window = 40
+long_window = 100 
+
+signals = pd.DataFrame(index=aapl.index)
+signals['signal'] = 0.0
+
+signals['short_mavg'] = aapl['Close'].rolling(window=short_window, min_periods=1, center=False).mean()
+
+signals['long_mavg'] = aapl['Close'].rolling(window=long_window, min_periods=1, center=False).mean()
+
+signals['signal'][short_window:] = np.where(signals['short_mvag'][short_window:] > signals['long_mavg'][short_window:], 1.0, 0.0)
+
+signals['positions'] = signals['signal'].diff()
+
+print(signals)
+```
+
 
 

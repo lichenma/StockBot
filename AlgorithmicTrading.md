@@ -315,8 +315,33 @@ These are data which aren't going deep into but here are some important informat
 
 ## Building a Trading Strategy with Python 
 
+### Common Trading Strategies 
+
+Recall that trading strategies are fixed plans to go long or short in markets. In general there are two common trading strategies - `momentum strategy` and `reversion strategy`. 
+
+Momentum strategy is also known as divergence or trend trading. when you follow this strategy you do so believing that the movement of a quantity will continue in its current direction. You trust that stocks have momentum upward or downwards that you can detect and exploit. 
+
+Examples include moving average crossover, dual moving average crossover and turtle trading. 
+
+* Moving average crossover is when price of an asset moves from one side of a moving average to the other. This crossing over indicates a change in momentum and is used as a point of making the decision to enter or exit the market. We will be coming this strategy which is the "hello world" of quantitative trading later in this tutorial
+
+* Dual moving average crossover is when a short-term average crosses a long-term average. This signal identifies that the momentum is shifting in the direction of the short-term average. Buy signal is generaged when the short-term average crosses the long-term average and rises above it and vice versa
+
+* Turtle trading was a popular trend taught by Richard Dennis which is to buy futures on a 20-day high and sell on a 20-day low. 
 
 
+
+On the other hand, the `reversion strategy`, also known as convergence or cycle trading centers around the belief that the movement of a quantity will eventually reverse. Examples include the mean reversion strategy and pairs trading mean-reversion
+
+* Mean reversion strategy centers around the idea that stocks return to their mean and you can exploit when it deviates from that mean 
+
+* Pairs trading mean-reversion states that if two stocks can be identified that have a relatively high correlation, the change in the difference in price between the two stocks can be used to signal trading events if one of the two moves out of correlation with the other. In this case the stock with the higher price is considered to be in the short position - it should be sold since the higher-priced stock will return to the mean. The lower priced stock is considered to be in the long position as the price is expected to rise as the correlation returns to normal 
+
+
+
+Aside from these two main strategies, there are also other ones which come up every once in a while. One example is the forecasting strategy which attempts to predict the direction or value of a stock in subsequent future time periods based on certain historical factors. There is also High-Frequency Trading(HFT) strategy which exploits the sub-millisecond market microstructure. 
+
+## Simple Trading Strategy
 
 
 

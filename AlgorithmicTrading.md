@@ -371,5 +371,80 @@ signals['positions'] = signals['signal'].diff()
 print(signals)
 ```
 
+## Backtesting the Trading Strategy
+
+With our strategy at hand, we will go ahead and backtest it and calculate its performance. 
+
+### Backtesting Pitfalls 
+
+Backtesting consists of testing a trading strategy on relevant historical data to make sure that it is an actual viable strategy before starting to make any moves. There are some pitfalls to keep in mind however. 
+
+* External events such as market regime shifts, regulatory changes, macroeconomic events 
+
+* Liquidity constraints such as the ban of short sales
+
+* Personal bias, for example, overfitting a model (optimization bias), ignoring a strategy rules because you want to (interference), introducing information into past data (lookahead bias)
+
+### Backtesting Components 
+
+There are four main components present in every backtester: 
+
+* Data handler, interface to a set of data 
+
+* Strategy, which generates a signal to go long or short based on data
+
+* Portfolio, which generates orders and managers Profit and Loss 
+
+* Execution handler, which sends the order to the broker and receives the signals that the stock has been bought or sold 
+
+### Implementation of a Simple Backtester 
+
+First we will be manually setting up a backtesting visualization using `matplotlib`. 
+
+```python 
+initial_capital = float(100000.0)
+
+positions = pd.DataFrame(index=signals.index).fillna(0.0)
+
+positions['AAPL'] = 100*signals['signal']
+
+portfolio = positions.multiply(aapl['Adj Close'], axis=0)
+
+pos_diff = positions.diff()
+
+portfolio['holdings'] = (positions.multiply(aapl['Adj Close'], axis=0)).sum(axis=1)
+
+portfolio['cash' = initial_capital - (pos_diff.multiply(aapl['Adj Close'], axis=0)).sum(axis=1).cumsum()
+
+portfolio['total'] = portfolio['cash'] + portfolio['holdings']
+
+portfolio['returns'] = portfolio['total'].pct_change()
+
+print(portfolio.head())
+```
+
+We can now visualize this using Matplotlib
+
+```python 
+import matplotlib.pyplot as plt
+
+fig = plt.figure()
+ax1 = fig.add_subplot(111, ylabel='Portfolio value in $')
+
+portfolio['total'].plot(ax=ax1, lw=2.)
+
+ax1.plot(portfolio.loc[signals.positions == 1.0].index, 
+        portfolio.total[signals.positions == 1.0],
+        '^', markersize=10, color='m')
+ax1.plot(portfolio.loc[signals.positions == -1.0].index, 
+        portfolio.total[signals.positions == -1.0], 
+        'v', markersize=10, color='k')
+
+plt.show()
+```
+
+### Backtests with Zipline & Quantopian 
+
+Quantopian is a free community-centered hosted platform for building and executing trading strategies. It is powered by `zipline`, a Python library for algorithmic trading. 
 
 

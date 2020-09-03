@@ -447,4 +447,91 @@ plt.show()
 
 Quantopian is a free community-centered hosted platform for building and executing trading strategies. It is powered by `zipline`, a Python library for algorithmic trading. 
 
+When we create a "New Algorithm" you will see that we have two definitions to start working from - `initialize()` and `handle_data()`. 
 
+The first function is called when the program is started and perfroms one-time startup logic. As an argument, the `initialize()` function takes a context used to store state during a backtest or live trading. 
+
+The `handle_data()` function is called once a minute during simulation or live-trading to decide what orders if any, should be placed per minute. The function takes in context and data as the input parameters - context is the same as outlined above while data is an object that stores several API functions (ex. `current()` to retrieve the most recent value of a given field or `history()` to get trailing windows of historical pricing)
+
+Another object present in quantopian is `portfolio` which stores information about the porfolio. 
+
+The `order_target()` is used to place an order to adjust a position to a target number of shares. Placing a negative target will result in a short position. 
+
+Once the strategy has been implemented we have the option to `Run Full Backtest` which allows us to easily backtest our algorithm on historical data. 
+
+
+Here is the sample algorithm from this tutorial: 
+
+```python 
+def initialize(context):
+    context.sym = symbol('AAPL')
+    context.i = 0
+
+
+def handle_data(context, data):
+    # Skip first 300 days to get full windows
+    context.i += 1
+    if context.i < 300:
+        return
+
+    # Compute averages
+    # history() has to be called with the same params
+    # from above and returns a pandas dataframe.
+    short_mavg = data.history(context.sym, 'price', 100, '1d').mean()
+    long_mavg = data.history(context.sym, 'price', 300, '1d').mean()
+
+    # Trading logic
+    if short_mavg > long_mavg:
+        # order_target orders as many shares as needed to
+        # achieve the desired number of shares.
+        order_target(context.sym, 100)
+    elif short_mavg < long_mavg:
+        order_target(context.sym, 0)
+
+    # Save values for later inspection
+    record(AAPL=data.current(context.sym, "price"),
+           short_mavg=short_mavg,
+           long_mavg=long_mavg)
+```
+
+## Improving the Trading Strategy 
+
+There are several algorithms which can be used to improve a model on a continuous basis such as KMeans, k-Nearest Neighbors (KNN), Classification or Regression Trees and the Genetic Algorithm. 
+
+We won't be covering these topics in this tutorial but these are good topics to look into to improve the base algorithm! 
+
+
+## Evaluating Moving Average Crossover Strategy 
+
+Aside from improving the strategy we should also be able to calculate some metrics to further judge our algorithm. First of all we can make use of the `Sharpe ratio` to get to know whether the portfolio's returns are the result of the fact that you decided to make smart investments or to take a lot of risks. 
+
+The ideal case is that the returns are considerable but the additional risk of investing is as small as possible. The greater the portfolio's Sharpe ratio, the better: a ratio greater than 1 is acceptable, 2 is very good and 3 is excellent. 
+
+```python
+# annualized Sharpe ratio
+sharpe_ratio = np.sqrt(252) * (returns.mean() / returns.std())
+```
+
+The Sharpe ratio is usually not considered as a standalone and is usually compared to other stocks. The best way to approach this issue is to extend the original trading strategy to other stocks. 
+
+There is also `Maximum Drawdown` which measures the largest single drop from peak to bottom in the value of a portfolio. 
+
+```python 
+# Define a trailing 252 trading day window 
+window = 252
+
+rolling_max = aapl['Adj Close'].rolling(window, min_periods=1).max()
+daily_drawdown = aapl['Adj Close']/rolling_max - 1.0
+
+max_daily_drawdown = daily_drawdown.rolling(window, min_periods=1).min()
+```
+
+Finally we will go over the Compound Annual Growth Rate (CAGR), which provides us with a constant rate of return over the time period. The rate is determined by dividing the investments ending value (EV) by the investment's beginning value (BV). You raise the result to the power of 1/n, where n is the number of periods. We take 1 from the consequent result and we have our value: 
+
+```
+(EV/BV)^1/n - 1
+```
+
+There are so many other metrics to consider but this is all that we will be going over in this introduction. 
+
+This concludes the tutorial! 
